@@ -3,6 +3,7 @@ package edu.utexas.cs.cs378;
 import lombok.SneakyThrows;
 
 import java.io.Writer;
+import java.util.concurrent.locks.LockSupport;
 
 public class StringBuffer {
     int bufferCount;
@@ -24,7 +25,7 @@ public class StringBuffer {
     public void writeIndex(int stringIndex, String computedResult) {
         int bufferIndex = stringIndex / stringsPerBuffer;
         while (maxWriteToBuffer < bufferIndex) {
-            Thread.sleep(1);
+            LockSupport.parkNanos(1);
         }
         int rotatedBufferIndex = bufferIndex % bufferCount;
         buffers[rotatedBufferIndex][stringIndex % stringsPerBuffer] = computedResult;

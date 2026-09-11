@@ -40,11 +40,11 @@ public class Main {
         new Thread(() -> {
             while (buffer.keepRunning) {
                 buffer.readTo(writer);
-                try {
-                    writer.flush();
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+            }
+            try {
+                writer.flush();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
         }).start();
 
