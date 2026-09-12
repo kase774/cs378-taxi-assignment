@@ -15,6 +15,7 @@ public class StringSerialization {
         }
 
         public char nextChar() {
+
             return line.charAt(index++);
         }
 
@@ -119,7 +120,13 @@ public class StringSerialization {
         public TaxiData.PaymentMethod parsePaymentMethod() {
             String next3Chars = line.substring(index, index + 3);
             index += 3;
-            return TaxiData.PaymentMethod.valueOf(next3Chars);
+            for (TaxiData.PaymentMethod method : TaxiData.PaymentMethod.values()) {
+                if (method.name().equals(next3Chars)) {
+                    return method;
+                }
+            }
+            errorFlag = true;
+            return null;
         }
 
         public int parse2Dec() {
@@ -131,42 +138,44 @@ public class StringSerialization {
         }
 
         public TaxiData parseTaxiData() {
-            TaxiData data = new TaxiData();
-            data.taxiIdMd5 = parseMd5();
+            byte[] taxiIdMd5 = parseMd5();
             if (expect(',')) return null;
-            data.taxiLicenseMd5 = parseMd5();
+            byte[] taxiLicenseMd5 = parseMd5();
             if (expect(',')) return null;
-            data.pickUpDate = parseDate();
+            int pickUpDate = parseDate();
             if (expect(',')) return null;
-            data.dropOffDate = parseDate();
+            int dropOffDate = parseDate();
             if (expect(',')) return null;
-            data.durationSeconds = (short) parseNumber();
+            short durationSeconds = (short) parseNumber();
             if (expect(',')) return null;
-            data.distanceInMiles = (short) parse2Dec();
+            short distanceInMiles = (short) parse2Dec();
             if (expect(',')) return null;
-            data.pickUpLong = parse6Dec();
+            int pickUpLong = parse6Dec();
             if (expect(',')) return null;
-            data.pickUpLat = parse6Dec();
+            int pickUpLat = parse6Dec();
             if (expect(',')) return null;
-            data.dropOffLong = parse6Dec();
+            int dropOffLong = parse6Dec();
             if (expect(',')) return null;
-            data.dropOffLat = parse6Dec();
+            int dropOffLat = parse6Dec();
             if (expect(',')) return null;
-            data.method = parsePaymentMethod();
+            TaxiData.PaymentMethod method = parsePaymentMethod();
             if (expect(',')) return null;
-            data.fare = parse2Dec();
+            int fare = parse2Dec();
             if (expect(',')) return null;
-            data.surcharge = (short) parse2Dec();
+            short surcharge = (short) parse2Dec();
             if (expect(',')) return null;
-            data.mtaTax = (byte) parse2Dec();
+            byte mtaTax = (byte) parse2Dec();
             if (expect(',')) return null;
-            data.tip = (short) parse2Dec();
+            short tip = (short) parse2Dec();
             if (expect(',')) return null;
-            data.tolls = (short) parse2Dec();
+            short tolls = (short) parse2Dec();
             if (expect(',')) return null;
-            data.total = parse2Dec();
+            int total = parse2Dec();
             if (errorFlag) return null;
-            return data;
+            return new TaxiData(taxiIdMd5, taxiLicenseMd5, pickUpDate, dropOffDate,
+                    durationSeconds, distanceInMiles, pickUpLong, pickUpLat,
+                    dropOffLong, dropOffLat, method, fare, surcharge, mtaTax, tip,
+                    tolls, total);
         }
     }
 
@@ -176,16 +185,20 @@ public class StringSerialization {
 
     public String toString(TaxiData input) {
         StringBuilder sb = new StringBuilder(160);
+
         appendMd5(sb, input.taxiIdMd5);
         sb.append(',');
         appendMd5(sb, input.taxiLicenseMd5);
+
         sb.append(',');
         appendDate(sb, input.pickUpDate);
         sb.append(',');
         appendDate(sb, input.dropOffDate);
         sb.append(',').append(input.durationSeconds);
+
         sb.append(',');
         append2Dec(sb, input.distanceInMiles);
+
         sb.append(',');
         append6Dec(sb, input.pickUpLong);
         sb.append(',');
@@ -194,7 +207,9 @@ public class StringSerialization {
         append6Dec(sb, input.dropOffLong);
         sb.append(',');
         append6Dec(sb, input.dropOffLat);
+
         sb.append(',').append(input.method);
+
         sb.append(',');
         append2Dec(sb, input.fare);
         sb.append(',');
@@ -207,6 +222,7 @@ public class StringSerialization {
         append2Dec(sb, input.tolls);
         sb.append(',');
         append2Dec(sb, input.total);
+
         return sb.toString();
     }
 

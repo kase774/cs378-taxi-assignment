@@ -6,25 +6,31 @@ import java.io.Writer;
 import java.util.concurrent.locks.LockSupport;
 
 public class StringBuffer {
-    int bufferCount;
+    private final int bufferCount;
     // rotating buffer system
-    String[][] buffers;
-    int stringsPerBuffer;
-    int allowReadFrom = 0;
-    volatile int maxWriteToBuffer;
-    boolean keepRunning = true;
+    // we load 1 buffer at a time to the writer and have
+    // bufferCount - 1 full buffers to help ensure that we always have to something to load
+    private final String[][] buffers;
+    private final int stringsPerBuffer;
+
+    // the nth buffer we are reading from; the index is readingFrom % bufferCount
+    private int readingFrom = 0;
+    // the maximum index that we can write to
+    private volatile int writingTo;
+    private boolean keepRunning = true;
 
     public StringBuffer(int bufferCount, int stringsPerBuffer) {
         this.bufferCount = bufferCount;
         this.stringsPerBuffer = stringsPerBuffer;
         this.buffers = new String[bufferCount][stringsPerBuffer];
-        this.maxWriteToBuffer = bufferCount - 1;
+        this.writingTo = bufferCount - 1; // initialize so that we can write to all of them
     }
 
     @SneakyThrows
-    public void writeIndex(int stringIndex, String computedResult) {
+    public void writeTo(int stringIndex, String computedResult) {
         int bufferIndex = stringIndex / stringsPerBuffer;
-        while (maxWriteToBuffer < bufferIndex) {
+        while (writingTo < bufferIndex) {
+            // stall
             LockSupport.parkNanos(1);
         }
         int rotatedBufferIndex = bufferIndex % bufferCount;
@@ -32,8 +38,8 @@ public class StringBuffer {
     }
 
     @SneakyThrows
-    public void readTo(Writer writer) {
-        int bufferIndex = allowReadFrom % bufferCount;
+    public boolean moveDataTo(Writer writer) {
+        int bufferIndex = readingFrom % bufferCount;
         for (int index = 0; index < stringsPerBuffer; index++) {
             String str;
             while ((str = buffers[bufferIndex][index]) == null && keepRunning) {
@@ -44,11 +50,14 @@ public class StringBuffer {
             buffers[bufferIndex][index] = null;
             writer.write('\n');
         }
-        allowReadFrom++;
-        maxWriteToBuffer++;
+        readingFrom++;
+        // it's fine because only 1 thread calls this
+        //noinspection NonAtomicOperationOnVolatileField
+        writingTo++;
+        return keepRunning;
     }
 
-    public void onEnd() {
+    public void writingFinished() {
         keepRunning = false;
     }
 }

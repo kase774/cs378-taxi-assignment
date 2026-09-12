@@ -32,7 +32,7 @@ public class TaxiDataPool extends ByteArrayOutputStream {
         return value;
     }
 
-    public static long getKeyAndAddToPool(TaxiData data) {
+    public static long getSortingKey(TaxiData data) {
         int id = getPoolId();
         TaxiDataPool pool = list.get(id);
         return ((long) data.fare) << 40 | (long) id << 32 | (long) pool.addTaxiAndGetIndex(data);
@@ -88,27 +88,33 @@ public class TaxiDataPool extends ByteArrayOutputStream {
         int offset = index * SIZE_PER_TAXI_DATA;
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(buf, offset,
                 SIZE_PER_TAXI_DATA));
-        TaxiData data = new TaxiData();
-        data.taxiIdMd5 = new byte[16];
-        in.readFully(data.taxiIdMd5);
-        data.taxiLicenseMd5 = new byte[16];
-        in.readFully(data.taxiLicenseMd5);
-        data.pickUpDate = in.readInt();
-        data.dropOffDate = in.readInt();
-        data.durationSeconds = in.readShort();
-        data.distanceInMiles = in.readShort();
-        data.pickUpLong = in.readInt();
-        data.pickUpLat = in.readInt();
-        data.dropOffLong = in.readInt();
-        data.dropOffLat = in.readInt();
-        data.method = TaxiData.PaymentMethod.values()[in.readUnsignedByte()];
-        data.fare = toUShort(in.readShort());
-        data.surcharge = in.readShort();
-        data.mtaTax = in.readByte();
-        data.tip = in.readShort();
-        data.tolls = in.readShort();
-        data.total = toUShort(in.readShort());
-        return data;
+        byte[] taxiIdMd5 = readMd5(in);
+        byte[] taxiLicenseMd5 = readMd5(in);
+        return new TaxiData(
+                taxiIdMd5,
+                taxiLicenseMd5,
+                in.readInt(),
+                in.readInt(),
+                in.readShort(),
+                in.readShort(),
+                in.readInt(),
+                in.readInt(),
+                in.readInt(),
+                in.readInt(),
+                TaxiData.PaymentMethod.values()[in.readUnsignedByte()],
+                toUShort(in.readShort()),
+                in.readShort(),
+                in.readByte(),
+                in.readShort(),
+                in.readShort(),
+                toUShort(in.readShort()));
+    }
+
+    @SneakyThrows
+    private static byte[] readMd5(DataInputStream in) {
+        byte[] md5 = new byte[16];
+        in.readFully(md5);
+        return md5;
     }
 
 }

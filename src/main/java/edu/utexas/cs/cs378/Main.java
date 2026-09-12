@@ -23,24 +23,14 @@ public class Main {
                 Files.newBufferedWriter(new File("SORTED-FILE-RESULT.txt").toPath());
         //noinspection resource
         long[] keys =
-                Files.lines(new File(BIG_CSV).toPath(), StandardCharsets.UTF_8).parallel().map(StringSerialization::parseLine).filter(Objects::nonNull).mapToLong(TaxiDataPool::getKeyAndAddToPool)
+                Files.lines(new File(BIG_CSV).toPath(), StandardCharsets.UTF_8).parallel().map(StringSerialization::parseLine).filter(Objects::nonNull).mapToLong(TaxiDataPool::getSortingKey)
                                 .sorted().toArray();
         System.out.println(System.currentTimeMillis() - start);
-
-//        Arrays.stream(keys).forEachOrdered(v -> {
-//            try {
-//                writer.write(StringSerialization.toString(TaxiDataPool.getFromPools(v)));
-//                writer.newLine();
-//            } catch (IOException e) {
-//                throw new RuntimeException(e);
-//            }
-//        });
         StringBuffer buffer = new StringBuffer(3, 1000);
 
         new Thread(() -> {
-            while (buffer.keepRunning) {
-                buffer.readTo(writer);
-            }
+            //noinspection StatementWithEmptyBody
+            while (buffer.moveDataTo(writer));
             try {
                 writer.flush();
             } catch (IOException e) {
@@ -49,9 +39,14 @@ public class Main {
         }).start();
 
         AtomicInteger curIndex = new AtomicInteger(0);
-        IntStream.generate(curIndex::getAndIncrement).limit(keys.length).parallel().forEach(index -> buffer.writeIndex(index, StringSerialization.toString(TaxiDataPool.getFromPools(keys[index]))));
+        // this way, parallelization only takes from the beginning, vs an IntStream with
+        // range would divide the work among the threads in a more equal fashion (which would
+        // undermine the whole purpose of using the buffer). this way, the threads divide the
+        // work from the base together, so multiple threads can work on the same thing at the
+        // same time
+        IntStream.generate(curIndex::getAndIncrement).limit(keys.length).parallel().forEach(index -> buffer.writeTo(index, StringSerialization.toString(TaxiDataPool.getFromPools(keys[index]))));
 
-        buffer.keepRunning = false;
+        buffer.writingFinished();
         System.out.println(System.currentTimeMillis() - start);
     }
 

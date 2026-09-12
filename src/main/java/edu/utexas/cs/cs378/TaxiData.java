@@ -36,6 +36,7 @@ import lombok.Data;
 //
 
 @Data
+@AllArgsConstructor
 public class TaxiData {
 
     // each one of these is 16 bytes
@@ -69,7 +70,7 @@ public class TaxiData {
     // 65k max, encode as ushort
     int total;
 
-    enum PaymentMethod {
+    public enum PaymentMethod {
         CSH, CRD, NOC, DIS, UNK;
     }
 }
