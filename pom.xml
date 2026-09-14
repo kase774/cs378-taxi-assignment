@@ -12,8 +12,8 @@
 	<url>http://maven.apache.org</url>
 
 	<properties>
-		<maven.compiler.source>25</maven.compiler.source>
-		<maven.compiler.target>25</maven.compiler.target>
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
 
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<checkstyle.version>8.30</checkstyle.version>
@@ -22,6 +22,8 @@
 		<lombok.version>1.18.40</lombok.version>
 		<junit.jupiter.version>5.10.2</junit.jupiter.version>
 		<maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
+		<slf4j.version>2.0.13</slf4j.version>
+		<logback.version>1.5.6</logback.version>
 	</properties>
 
 	<reporting>
@@ -148,7 +150,7 @@
 					<includeProjectDependencies>true</includeProjectDependencies>
 					<includePluginDependencies>true</includePluginDependencies>
 					<killAfter>-1</killAfter>
-					<mainClass>edu.utexas.cs.cs378.Main</mainClass>
+					<mainClass>edu.utexas.cs.cs378.MapService</mainClass>
 					<cleanupDaemonThreads>false</cleanupDaemonThreads>
 				</configuration>
 			</plugin>
@@ -257,6 +259,17 @@
 			<groupId>com.esotericsoftware</groupId>
 			<artifactId>kryo</artifactId>
 			<version>5.6.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
 		</dependency>
 
 	</dependencies>

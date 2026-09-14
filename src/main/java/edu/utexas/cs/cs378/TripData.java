@@ -37,40 +37,45 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class TaxiData {
+public class TripData {
 
     // each one of these is 16 bytes
-    byte[] taxiIdMd5;
-    byte[] taxiLicenseMd5;
+    public byte[] carHash;
+    public byte[] driverHash;
 
     // from 2013-01-01 to 2013-06-28
     // except for 3: 2 of 2013-07-18
     // one of 2013-12-12, 2014-01-03
     // these are actually all errored inputs:
     // the 2 2013-07-18 ones have lat and long 0.000000
-    int pickUpDate;
-    int dropOffDate;
+    public int pickUpDate;
+    public int dropOffDate;
     // max 10800
-    short durationSeconds;
-    short distanceInMiles;
+    public short durationSeconds;
+    public short distanceInMiles;
     // 8 digits, always 6 dec places
-    int pickUpLong;
-    int pickUpLat;
-    int dropOffLong;
-    int dropOffLat;
+    public int pickUpLong;
+    public int pickUpLat;
+    public int dropOffLong;
+    public int dropOffLat;
     // encode index as 1 byte
-    PaymentMethod method;
+    public PaymentMethod method;
     // 50k max
     // encode as ushort
-    int fare;
-    short surcharge;
-    byte mtaTax;
-    short tip;
-    short tolls;
+    public int fare;
+    public short surcharge;
+    public byte mtaTax;
+    public short tip;
+    public short tolls;
     // 65k max, encode as ushort
-    int total;
+    public int total;
 
     public enum PaymentMethod {
         CSH, CRD, NOC, DIS, UNK;
+    }
+
+    public boolean correctTotalSum() {
+        int calculatedTotal = fare + surcharge + mtaTax + tip + tolls;
+        return calculatedTotal == total;
     }
 }

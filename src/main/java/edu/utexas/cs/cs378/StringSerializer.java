@@ -3,15 +3,16 @@ package edu.utexas.cs.cs378;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class StringSerialization {
+public class StringSerializer {
 
     static class Cursor {
-        int index = 0;
+        int index;
         String line;
         boolean errorFlag = false;
 
-        public Cursor(String line) {
+        public Cursor(String line, int index) {
             this.line = line;
+            this.index = index;
         }
 
         public char nextChar() {
@@ -117,10 +118,10 @@ public class StringSerialization {
             return negative ? -value : value;
         }
 
-        public TaxiData.PaymentMethod parsePaymentMethod() {
+        public TripData.PaymentMethod parsePaymentMethod() {
             String next3Chars = line.substring(index, index + 3);
             index += 3;
-            for (TaxiData.PaymentMethod method : TaxiData.PaymentMethod.values()) {
+            for (TripData.PaymentMethod method : TripData.PaymentMethod.values()) {
                 if (method.name().equals(next3Chars)) {
                     return method;
                 }
@@ -137,7 +138,7 @@ public class StringSerialization {
             return value;
         }
 
-        public TaxiData parseTaxiData() {
+        public TripData parseTaxiData() {
             byte[] taxiIdMd5 = parseMd5();
             if (expect(',')) return null;
             byte[] taxiLicenseMd5 = parseMd5();
@@ -158,7 +159,7 @@ public class StringSerialization {
             if (expect(',')) return null;
             int dropOffLat = parse6Dec();
             if (expect(',')) return null;
-            TaxiData.PaymentMethod method = parsePaymentMethod();
+            TripData.PaymentMethod method = parsePaymentMethod();
             if (expect(',')) return null;
             int fare = parse2Dec();
             if (expect(',')) return null;
@@ -172,58 +173,15 @@ public class StringSerialization {
             if (expect(',')) return null;
             int total = parse2Dec();
             if (errorFlag) return null;
-            return new TaxiData(taxiIdMd5, taxiLicenseMd5, pickUpDate, dropOffDate,
+            return new TripData(taxiIdMd5, taxiLicenseMd5, pickUpDate, dropOffDate,
                     durationSeconds, distanceInMiles, pickUpLong, pickUpLat,
                     dropOffLong, dropOffLat, method, fare, surcharge, mtaTax, tip,
                     tolls, total);
         }
     }
 
-    public TaxiData parseLine(String line) {
-        return new Cursor(line).parseTaxiData();
-    }
-
-    public String toString(TaxiData input) {
-        StringBuilder sb = new StringBuilder(160);
-
-        appendMd5(sb, input.taxiIdMd5);
-        sb.append(',');
-        appendMd5(sb, input.taxiLicenseMd5);
-
-        sb.append(',');
-        appendDate(sb, input.pickUpDate);
-        sb.append(',');
-        appendDate(sb, input.dropOffDate);
-        sb.append(',').append(input.durationSeconds);
-
-        sb.append(',');
-        append2Dec(sb, input.distanceInMiles);
-
-        sb.append(',');
-        append6Dec(sb, input.pickUpLong);
-        sb.append(',');
-        append6Dec(sb, input.pickUpLat);
-        sb.append(',');
-        append6Dec(sb, input.dropOffLong);
-        sb.append(',');
-        append6Dec(sb, input.dropOffLat);
-
-        sb.append(',').append(input.method);
-
-        sb.append(',');
-        append2Dec(sb, input.fare);
-        sb.append(',');
-        append2Dec(sb, input.surcharge);
-        sb.append(',');
-        append2Dec(sb, input.mtaTax);
-        sb.append(',');
-        append2Dec(sb, input.tip);
-        sb.append(',');
-        append2Dec(sb, input.tolls);
-        sb.append(',');
-        append2Dec(sb, input.total);
-
-        return sb.toString();
+    public TripData parseLine(String line) {
+        return new Cursor(line, 0).parseTaxiData();
     }
 
     private static final char[] HEX = "0123456789ABCDEF".toCharArray();
@@ -233,6 +191,10 @@ public class StringSerialization {
         for (byte b : md5) {
             sb.append(HEX[(b >> 4) & 0xF]).append(HEX[b & 0xF]);
         }
+    }
+
+    private static void appendMd5(StringBuilder sb, Md5Wrapper md5) {
+        appendMd5(sb, md5.toArray());
     }
 
     private static void appendTwo(StringBuilder sb, int value) {
@@ -282,6 +244,64 @@ public class StringSerialization {
         appendTwo(sb, fraction / 10000);
         appendTwo(sb, fraction / 100 % 100);
         appendTwo(sb, fraction % 100);
+    }
+
+
+    public String toString(TripData input) {
+        StringBuilder sb = new StringBuilder(160);
+
+        appendMd5(sb, input.carHash);
+        sb.append(',');
+        appendMd5(sb, input.driverHash);
+
+        sb.append(',');
+        appendDate(sb, input.pickUpDate);
+        sb.append(',');
+        appendDate(sb, input.dropOffDate);
+        sb.append(',').append(input.durationSeconds);
+
+        sb.append(',');
+        append2Dec(sb, input.distanceInMiles);
+
+        sb.append(',');
+        append6Dec(sb, input.pickUpLong);
+        sb.append(',');
+        append6Dec(sb, input.pickUpLat);
+        sb.append(',');
+        append6Dec(sb, input.dropOffLong);
+        sb.append(',');
+        append6Dec(sb, input.dropOffLat);
+
+        sb.append(',').append(input.method);
+
+        sb.append(',');
+        append2Dec(sb, input.fare);
+        sb.append(',');
+        append2Dec(sb, input.surcharge);
+        sb.append(',');
+        append2Dec(sb, input.mtaTax);
+        sb.append(',');
+        append2Dec(sb, input.tip);
+        sb.append(',');
+        append2Dec(sb, input.tolls);
+        sb.append(',');
+        append2Dec(sb, input.total);
+
+        return sb.toString();
+    }
+
+    // looks like (3FF2709163DE7036FCAA4E5A3324E4BF, 10, 3239458.19)
+    public String toString(DriverCarEarnings earnings) {
+        StringBuilder sb = new StringBuilder(64);
+
+        sb.append('(');
+        appendMd5(sb, earnings.getDriver());
+        sb.append(", ").append(earnings.getCars().size());
+        sb.append(", ");
+        append2Dec(sb, earnings.getTotalEarnings());
+        sb.append(')');
+
+        return sb.toString();
     }
 
 }

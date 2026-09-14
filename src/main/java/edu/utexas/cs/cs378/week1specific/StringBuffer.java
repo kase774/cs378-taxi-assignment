@@ -1,10 +1,12 @@
-package edu.utexas.cs.cs378;
+package edu.utexas.cs.cs378.week1specific;
 
 import lombok.SneakyThrows;
 
 import java.io.Writer;
 import java.util.concurrent.locks.LockSupport;
 
+// week 1
+@SuppressWarnings("unused")
 public class StringBuffer {
     private final int bufferCount;
     // rotating buffer system
