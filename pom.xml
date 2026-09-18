@@ -8,6 +8,7 @@
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
+<!--	modified in week 2 -->
 	<name>TaxiSort</name>
 	<url>http://maven.apache.org</url>
 
