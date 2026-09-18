@@ -1,3 +1,4 @@
+// modified in week 2
 package edu.utexas.cs.cs378;
 
 import lombok.SneakyThrows;
@@ -57,7 +58,8 @@ public class ReductionService {
     @SneakyThrows
     public static void main(String[] args) {
         ServerSocket serverSocket = new ServerSocket(31001);
-        setClipboardToAddress(serverSocket);
+        // setClipboardToAddress(serverSocket);
+        // WARNING! Only do this for faster startup, will erase your clipboard
         LOG.info("server started - {}:{}", serverSocket.getInetAddress(),
                 serverSocket.getLocalPort());
 

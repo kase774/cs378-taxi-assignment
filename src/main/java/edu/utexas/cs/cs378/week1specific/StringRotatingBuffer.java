@@ -7,7 +7,7 @@ import java.util.concurrent.locks.LockSupport;
 
 // week 1
 @SuppressWarnings("unused")
-public class StringBuffer {
+public class StringRotatingBuffer {
     private final int bufferCount;
     // rotating buffer system
     // we load 1 buffer at a time to the writer and have
@@ -21,7 +21,7 @@ public class StringBuffer {
     private volatile int writingTo;
     private boolean keepRunning = true;
 
-    public StringBuffer(int bufferCount, int stringsPerBuffer) {
+    public StringRotatingBuffer(int bufferCount, int stringsPerBuffer) {
         this.bufferCount = bufferCount;
         this.stringsPerBuffer = stringsPerBuffer;
         this.buffers = new String[bufferCount][stringsPerBuffer];

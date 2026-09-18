@@ -17,7 +17,7 @@ for row in open(CSV):
     p = row.rstrip("\n").split(",")
     try:
         fare, sur, mta, tip, tolls, total = (round(float(p[i]) * CENTS) for i in range(FARE, TOTAL + 1))
-    except ValueError:
+    except (ValueError, IndexError):
         continue
     if fare + sur + mta + tip + tolls != total or total >= MAX_TOTAL_CENTS:
         continue

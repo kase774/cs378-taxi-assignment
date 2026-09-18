@@ -1,3 +1,4 @@
+// modified in week 2
 package edu.utexas.cs.cs378;
 
 import lombok.SneakyThrows;
@@ -40,8 +41,24 @@ public class MapService {
         // Setup output stream to send data to the server
         BufferedOutputStream stream = new BufferedOutputStream(socket.getOutputStream());
         AtomicInteger sentCounter = new AtomicInteger();
+        BinaryRotatingBuffer buffer = new BinaryRotatingBuffer(3, 1000);
+
+        new Thread(() -> {
+            try {
+                while (buffer.isRunning()) {
+                    buffer.moveDataTo(stream);
+                }
+                stream.flush();
+                socket.close();
+            } catch (Exception ohNoThisIsVeryBad) {
+//                TripDriverCarTotalData deserializedData =
+//                        BinarySerializer.readDriverCarEarningsData(new DataInputStream(new ByteArrayInputStream(data)));
+                LOG.error("while sending data :(", ohNoThisIsVeryBad);
+            }
+        }).start();
+
         //noinspection resource
-        Files.lines(new File(BIG_CSV).toPath(), StandardCharsets.UTF_8)
+        Files.lines(new File(SMALL_CSV).toPath(), StandardCharsets.UTF_8)
                 .parallel()
                 .map(StringSerializer::parseLine)
                 .filter(Objects::nonNull)
@@ -49,24 +66,13 @@ public class MapService {
                 .filter(data -> data.total < 50000)
                 .map(TripDriverCarTotalData::new)
                 .map(BinarySerializer::convertToByteArray)
-                .peek(data -> sentCounter.incrementAndGet())
-                .forEachOrdered(data -> {
-                    try {
-                        stream.write(data);
-                    }catch (Exception ohNoThisIsVeryBad) {
-                        TripDriverCarTotalData deserializedData =
-                                BinarySerializer.readDriverCarEarningsData(
-                                        new DataInputStream(new ByteArrayInputStream(data))
-                                );
-                        LOG.error("while sending data {}", deserializedData, ohNoThisIsVeryBad);
-                    }
-                });
+                .forEach(data -> {
+            int count = sentCounter.getAndIncrement();
+            buffer.writeTo(count, data);
+        });
 
-        stream.flush();
         LOG.info("finished sending data - {} elements sent", sentCounter.get());
-
-        socket.close();
-
+        buffer.writingFinished();
     }
 
 }
