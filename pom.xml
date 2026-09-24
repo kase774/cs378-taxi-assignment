@@ -24,6 +24,7 @@
 		<maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
 		<slf4j.version>2.0.13</slf4j.version>
 		<logback.version>1.5.13</logback.version>
+		<exec.mainClass>edu.utexas.cs.cs378.week2.DriverEarningsMapService</exec.mainClass>
 	</properties>
 
 	<reporting>
@@ -150,7 +151,7 @@
 					<includeProjectDependencies>true</includeProjectDependencies>
 					<includePluginDependencies>true</includePluginDependencies>
 					<killAfter>-1</killAfter>
-					<mainClass>edu.utexas.cs.cs378.week2.DriverEarningsMapService</mainClass>
+					<mainClass>${exec.mainClass}</mainClass>
 					<cleanupDaemonThreads>false</cleanupDaemonThreads>
 				</configuration>
 			</plugin>

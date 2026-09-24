@@ -2,12 +2,12 @@ package edu.utexas.cs.cs378.hours;
 
 import edu.utexas.cs.cs378.Archetypes;
 import edu.utexas.cs.cs378.BinarySerializer;
+import edu.utexas.cs.cs378.Parameters;
 
 import java.util.Arrays;
 
 public class HourFinalReductionService {
 
-    private static final int NUMBER_OF_CLIENTS = 2;
     private static final int TAKE_HIGHEST = 3;
 
     private static final HoursEarningsAggregateData aggregateData =
@@ -17,7 +17,7 @@ public class HourFinalReductionService {
     // usage:
     // launch; this will output the socket address
     public static void main(String[] args) {
-        Archetypes.finalReductionService(NUMBER_OF_CLIENTS, inputStream -> {
+        Archetypes.finalReductionService(Parameters.getNumberOfClients(), inputStream -> {
             synchronized (aggregateData) {
                 aggregateData.merge(BinarySerializer.readHoursEarningsAggregateData(inputStream));
             }

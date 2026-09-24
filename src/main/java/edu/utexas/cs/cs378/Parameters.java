@@ -56,6 +56,11 @@ public class Parameters {
         return intProperty("connect.timeout.ms", 2000);
     }
 
+    // how many intermediate reductions the final reduction expects to connect
+    public int getNumberOfClients() {
+        return intProperty("clients", 2);
+    }
+
     private int intProperty(String key, int defaultValue) {
         String value = System.getProperty(key);
         if (value == null || value.trim().isEmpty()) {
