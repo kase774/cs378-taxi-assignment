@@ -29,13 +29,17 @@ public class Parameters {
 
         if (dataString == null || dataString.trim().isEmpty()) {
             dataString = getLine("enter server address:");
-        } else {
-            System.out.println("using property server address: " + dataString);
+            System.setProperty("server.address", dataString);
         }
 
-        String[] parts = dataString.split(":");
-        String host = parts[0];
-        int port = Integer.parseInt(parts[1]);
+        int colon = dataString.lastIndexOf(':');
+        if (colon < 0) {
+            throw new IllegalArgumentException(
+                    "server.address must be \"host:port\" but was \"" + dataString + "\""
+                            + " (pass it as e.g. server.address=127.0.1.1:31001)");
+        }
+        String host = dataString.substring(0, colon);
+        int port = Integer.parseInt(dataString.substring(colon + 1));
         return new InetSocketAddress(host, port);
     }
 
@@ -71,24 +75,19 @@ public class Parameters {
 
     public String getDataset() {
         String dataString = System.getProperty("dataset");
-        boolean usedProperty = true;
         if (dataString == null || dataString.trim().isEmpty()) {
             dataString = getLine("enter dataset path: (1 = p1, 2 = p2, 3 = small)");
-            usedProperty = false;
+            System.setProperty("dataset", dataString);
         }
 
         int value = Integer.parseInt(dataString);
-        String result = switch (value) {
+
+        return switch (value) {
             case 1 -> BIG_CSV_P1;
             case 2 -> BIG_CSV_P2;
             case 3 -> SMALL_CSV;
             default -> throw new IllegalArgumentException("Invalid dataset path");
         };
-
-        if (usedProperty) {
-            System.out.println("using property dataset: " + result);
-        }
-        return result;
     }
 
 }

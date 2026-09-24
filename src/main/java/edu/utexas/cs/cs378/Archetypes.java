@@ -13,6 +13,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -60,6 +61,53 @@ public class Archetypes {
 
         LOG.info("finished sending data - {} elements sent", counter);
     }
+
+    @SneakyThrows
+    public void fromFileMappingService(String suffix) {
+        Path datasetFile = new File(Parameters.getDataset() + suffix).toPath();
+
+        Socket clientSocket = getClientSocket();
+        OutputStream stream = getOutputStreamAndSendSignal(clientSocket, CLIENT_SEND);
+
+        getInputStreamAndWaitForSignal(clientSocket, SERVER_SEND);
+
+        // datasetFile is the concatenation of the fixed-size records produced by
+        // fileMappingService, so forward it verbatim to the reduction service
+        long copied = Files.copy(datasetFile, stream);
+        stream.flush();
+
+        clientSocket.close();
+
+        LOG.info("finished sending data - {} bytes from {}", copied, datasetFile);
+    }
+
+    @SneakyThrows
+    public <T> void fileMappingService(int elementSize, String suffix,
+                                       Function<TripData, T> transformer, Function<T, byte[]> toByteArray,
+                                       Predicate<TripData> filter) {
+        String dataset = Parameters.getDataset();
+        Path datasetFile = new File(dataset).toPath();
+        Path outputFile = new File(dataset + suffix).toPath();
+
+        BinaryRotatingBufferStream buffer = new BinaryRotatingBufferStream(3, elementSize, 100000,
+                Files.newOutputStream(outputFile, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING));
+
+        //noinspection resource
+        int counter =
+                buffer.takeIn(
+                        Files.lines(datasetFile, StandardCharsets.UTF_8)
+                                .parallel()
+                                .map(StringSerializer::parseLine)
+                                .filter(Objects::nonNull) // parseLine returns null for bad lines
+                                .filter(filter)
+                                .map(transformer)
+                                .map(toByteArray));
+
+
+        LOG.info("finished writing data - {} elements written", counter);
+    }
+
+
 
     // usage:
     // launch; then enter IP of final reduction server
