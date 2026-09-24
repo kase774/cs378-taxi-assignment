@@ -1,8 +1,8 @@
-// modified in week 2
 package edu.utexas.cs.cs378;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.experimental.UtilityClass;
 
 
 // all models
@@ -41,42 +41,80 @@ import lombok.Data;
 public class TripData {
 
     // each one of these is 16 bytes
-    public byte[] carHash;
-    public byte[] driverHash;
+    private byte[] carHash;
+    private byte[] driverHash;
 
     // from 2013-01-01 to 2013-06-28
     // except for 3: 2 of 2013-07-18
     // one of 2013-12-12, 2014-01-03
     // these are actually all errored inputs:
     // the 2 2013-07-18 ones have lat and long 0.000000
-    public int pickUpDate;
-    public int dropOffDate;
+    private int pickUpDate;
+    private int dropOffDate;
     // max 10800
-    public short durationSeconds;
-    public short distanceInMiles;
+    private short durationSeconds;
+    private short distanceInMiles;
     // 8 digits, always 6 dec places
-    public int pickUpLong;
-    public int pickUpLat;
-    public int dropOffLong;
-    public int dropOffLat;
+    private int pickUpLong;
+    private int pickUpLat;
+    private int dropOffLong;
+    private int dropOffLat;
     // encode index as 1 byte
-    public PaymentMethod method;
+    private PaymentMethod method;
     // 50k max
     // encode as ushort
-    public int fare;
-    public short surcharge;
-    public byte mtaTax;
-    public short tip;
-    public short tolls;
+    private int fare;
+    private short surcharge;
+    private byte mtaTax;
+    private short tip;
+    private short tolls;
     // 65k max, encode as ushort
-    public int total;
+    private int total;
 
     public enum PaymentMethod {
         CSH, CRD, NOC, DIS, UNK;
     }
 
     public boolean correctTotalSum() {
-        int calculatedTotal = fare + surcharge + mtaTax + tip + tolls;
-        return calculatedTotal == total;
+        int calculatedTotal = getFare() + getSurcharge() + getMtaTax() + getTip() + getTolls();
+        return calculatedTotal == getTotal();
+    }
+
+    @UtilityClass
+    public static class Dates {
+
+        private int monthValue(int timestamp) {
+            int date = timestamp / 86400;
+            int month = date / 31;
+            if (date % 31 == 0) {
+                month--;
+            }
+            return month;
+        }
+
+        public int getYear(int timestamp) {
+            return 2013 + (monthValue(timestamp) - 1) / 12;
+        }
+
+        public byte getMonth(int timestamp) {
+            return (byte) ((monthValue(timestamp) - 1) % 12 + 1);
+        }
+
+        public byte getDay(int timestamp) {
+            int day = timestamp / 86400 % 31;
+            return (byte) (day == 0 ? 31 : day);
+        }
+
+        public byte getHour(int timestamp) {
+            return (byte) (timestamp / 3600 % 24);
+        }
+
+        public byte getMinute(int timestamp) {
+            return (byte) (timestamp / 60 % 60);
+        }
+
+        public byte getSecond(int timestamp) {
+            return (byte) (timestamp % 60);
+        }
     }
 }

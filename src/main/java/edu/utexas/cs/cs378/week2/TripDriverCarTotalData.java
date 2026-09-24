@@ -1,6 +1,6 @@
-// modified in week 2
-package edu.utexas.cs.cs378;
+package edu.utexas.cs.cs378.week2;
 
+import edu.utexas.cs.cs378.TripData;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -22,6 +22,6 @@ public class TripDriverCarTotalData {
     int total;
 
     public TripDriverCarTotalData(TripData data) {
-        this(data.carHash, data.driverHash, data.total);
+        this(data.getCarHash(), data.getDriverHash(), data.getTotal());
     }
 }

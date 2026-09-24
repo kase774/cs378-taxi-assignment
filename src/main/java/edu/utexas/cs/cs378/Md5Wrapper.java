@@ -1,4 +1,3 @@
-// modified in week 2
 package edu.utexas.cs.cs378;
 
 import java.nio.ByteBuffer;
@@ -26,6 +25,17 @@ public class Md5Wrapper {
         buffer.putLong(upper);
         buffer.putLong(lower);
         return buffer.array();
+    }
+
+    private static final char[] HEX = "0123456789ABCDEF".toCharArray();
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder(32);
+        for (byte b : toArray()) {
+            sb.append(HEX[(b >> 4) & 0xF]).append(HEX[b & 0xF]);
+        }
+        return sb.toString();
     }
 
     @Override

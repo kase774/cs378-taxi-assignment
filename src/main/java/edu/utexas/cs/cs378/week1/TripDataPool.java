@@ -1,4 +1,4 @@
-package edu.utexas.cs.cs378.week1specific;
+package edu.utexas.cs.cs378.week1;
 
 import edu.utexas.cs.cs378.BinarySerializer;
 import edu.utexas.cs.cs378.TripData;
@@ -42,7 +42,7 @@ public class TripDataPool extends ByteArrayOutputStream {
     public static long getSortingKey(TripData data) {
         int id = getPoolId();
         TripDataPool pool = list.get(id);
-        return ((long) data.fare) << 40 | (long) id << 32 | (long) pool.addTaxiAndGetIndex(data);
+        return ((long) data.getFare()) << 40 | (long) id << 32 | (long) pool.addTaxiAndGetIndex(data);
     }
 
     private static final long ID_MASK = (1L << 32) - 1;

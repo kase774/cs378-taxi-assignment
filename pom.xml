@@ -4,13 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>edu.bu.cs665</groupId>
-	<artifactId>TaxiSort</artifactId>
+	<artifactId>TaxiService</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-<!--	modified in week 2 -->
-	<name>TaxiSort</name>
-	<url>http://maven.apache.org</url>
+	<name>TaxiService</name>
+	<url>https://maven.apache.org</url>
 
 	<properties>
 		<maven.compiler.source>21</maven.compiler.source>
@@ -24,7 +23,7 @@
 		<junit.jupiter.version>5.10.2</junit.jupiter.version>
 		<maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
 		<slf4j.version>2.0.13</slf4j.version>
-		<logback.version>1.5.6</logback.version>
+		<logback.version>1.5.13</logback.version>
 	</properties>
 
 	<reporting>
@@ -151,7 +150,7 @@
 					<includeProjectDependencies>true</includeProjectDependencies>
 					<includePluginDependencies>true</includePluginDependencies>
 					<killAfter>-1</killAfter>
-					<mainClass>edu.utexas.cs.cs378.MapService</mainClass>
+					<mainClass>edu.utexas.cs.cs378.week2.DriverEarningsMapService</mainClass>
 					<cleanupDaemonThreads>false</cleanupDaemonThreads>
 				</configuration>
 			</plugin>
@@ -239,29 +238,11 @@
 			<scope>test</scope>
 		</dependency>
 
-<!-- 		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-1.2-api</artifactId>
-			<version>2.13.1</version>
-		</dependency>
-
-		<dependency>
-		  <groupId>org.apache.logging.log4j</groupId>
-		  <artifactId>log4j-core</artifactId>
-		  <version>[2.13.2,)</version>
-		</dependency>
-		 -->
 		<dependency>
     		<groupId>org.apache.commons</groupId>
     		<artifactId>commons-compress</artifactId>
     		<version>1.26.0</version>
 		</dependency>
-		<dependency>
-			<groupId>com.esotericsoftware</groupId>
-			<artifactId>kryo</artifactId>
-			<version>5.6.2</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>

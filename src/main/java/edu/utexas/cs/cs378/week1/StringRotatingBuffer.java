@@ -1,4 +1,4 @@
-package edu.utexas.cs.cs378.week1specific;
+package edu.utexas.cs.cs378.week1;
 
 import lombok.SneakyThrows;
 

@@ -1,6 +1,6 @@
-// modified in week 2
-package edu.utexas.cs.cs378;
+package edu.utexas.cs.cs378.week2;
 
+import edu.utexas.cs.cs378.Md5Wrapper;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 

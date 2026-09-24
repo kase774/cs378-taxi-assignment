@@ -1,6 +1,6 @@
-// modified in week 2
 package edu.utexas.cs.cs378;
 
+import edu.utexas.cs.cs378.week2.DriverCarEarnings;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -251,42 +251,42 @@ public class StringSerializer {
     public String toString(TripData input) {
         StringBuilder sb = new StringBuilder(160);
 
-        appendMd5(sb, input.carHash);
+        appendMd5(sb, input.getCarHash());
         sb.append(',');
-        appendMd5(sb, input.driverHash);
+        appendMd5(sb, input.getDriverHash());
 
         sb.append(',');
-        appendDate(sb, input.pickUpDate);
+        appendDate(sb, input.getPickUpDate());
         sb.append(',');
-        appendDate(sb, input.dropOffDate);
-        sb.append(',').append(input.durationSeconds);
+        appendDate(sb, input.getDropOffDate());
+        sb.append(',').append(input.getDurationSeconds());
 
         sb.append(',');
-        append2Dec(sb, input.distanceInMiles);
+        append2Dec(sb, input.getDistanceInMiles());
 
         sb.append(',');
-        append6Dec(sb, input.pickUpLong);
+        append6Dec(sb, input.getPickUpLong());
         sb.append(',');
-        append6Dec(sb, input.pickUpLat);
+        append6Dec(sb, input.getPickUpLat());
         sb.append(',');
-        append6Dec(sb, input.dropOffLong);
+        append6Dec(sb, input.getDropOffLong());
         sb.append(',');
-        append6Dec(sb, input.dropOffLat);
+        append6Dec(sb, input.getDropOffLat());
 
-        sb.append(',').append(input.method);
+        sb.append(',').append(input.getMethod());
 
         sb.append(',');
-        append2Dec(sb, input.fare);
+        append2Dec(sb, input.getFare());
         sb.append(',');
-        append2Dec(sb, input.surcharge);
+        append2Dec(sb, input.getSurcharge());
         sb.append(',');
-        append2Dec(sb, input.mtaTax);
+        append2Dec(sb, input.getMtaTax());
         sb.append(',');
-        append2Dec(sb, input.tip);
+        append2Dec(sb, input.getTip());
         sb.append(',');
-        append2Dec(sb, input.tolls);
+        append2Dec(sb, input.getTolls());
         sb.append(',');
-        append2Dec(sb, input.total);
+        append2Dec(sb, input.getTotal());
 
         return sb.toString();
     }
