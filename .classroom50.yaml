@@ -1,0 +1,12 @@
+schema: "classroom50/repo-config/v1"
+classroom: "ut-austin-cs378-cloud-computing"
+assignment: "cs378-assignment-3"
+owner:
+  username: "AdrienChew246"
+  id: 74026675
+  accepted_at: "2026-09-17T17:34:03Z"
+source:
+  owner: "kiat"
+  owner_id: 1133111
+  repo: "cloud-template-a2"
+  branch: "main"
