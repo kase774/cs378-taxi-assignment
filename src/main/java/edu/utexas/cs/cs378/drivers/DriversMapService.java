@@ -10,11 +10,11 @@ public class DriversMapService {
         // 20 bytes per record: 16 byte driver hash + short duration + short earnings
 
         // original: parse the CSV and stream it straight to the reduction
-//        Archetypes.mappingService(20,
-//                DriverEarnRateData::new,
-//                BinarySerializer::convertToByteArray,
-//                data -> data.getTotal() < 30000 && data.getTip() < 30000 && data.getTip() > 500 && data.getTotal() > 500
-//        );
+        Archetypes.mappingService(20,
+                DriverEarnRateData::new,
+                BinarySerializer::convertToByteArray,
+                data -> data.getTotal() < 30000 && data.getTip() < 30000 && data.getTip() > 500 && data.getTotal() > 500
+        );
 
         // split: compute the map output into <dataset>.drivers, then stream the file
 //        Archetypes.fileMappingService(20,
@@ -24,6 +24,7 @@ public class DriversMapService {
 //                data -> data.getTotal() < 30000 && data.getTip() < 30000 && data.getTip() > 500 && data.getTotal() > 500
 //        );
 
-        Archetypes.fromFileMappingService(".drivers");
+        // read the parsed data from file and then send that to the reduction servers.
+//        Archetypes.fromFileMappingService(".drivers");
     }
 }

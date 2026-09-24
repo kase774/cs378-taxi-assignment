@@ -8,11 +8,11 @@ public class HoursMapService {
     @SneakyThrows
     public static void main(String[] args) {
         // original: parse the CSV and stream it straight to the reduction
-//        Archetypes.mappingService(3,
-//                TripHourData::new,
-//                BinarySerializer::convertToByteArray,
-//                data -> data.getTotal() < 30000 && data.getTip() < 30000 && data.getTip() > 500 && data.getTotal() > 500
-//        );
+        Archetypes.mappingService(3,
+                TripHourData::new,
+                BinarySerializer::convertToByteArray,
+                data -> data.getTotal() < 30000 && data.getTip() < 30000 && data.getTip() > 500 && data.getTotal() > 500
+        );
 
         // split: compute the map output into <dataset>.hours, then stream the file
 //        Archetypes.fileMappingService(3,
@@ -22,7 +22,8 @@ public class HoursMapService {
 //                data -> data.getTotal() < 30000 && data.getTip() < 30000 && data.getTip() > 500 && data.getTotal() > 500
 //        );
 
-        Archetypes.fromFileMappingService(".hours");
+        // read the parsed data from file and then send that to the reduction servers.
+//        Archetypes.fromFileMappingService(".hours");
     }
 
 }
